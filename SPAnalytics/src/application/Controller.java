@@ -136,12 +136,15 @@ public class Controller {
 	@FXML private Label homeNetChartSuccess;
 	@FXML private Label awayNetChartFail;
 	@FXML private Label awayNetChartSuccess;
-	
-
 	private ArrayList<DrawnObject> homeNetChartItems = new ArrayList<DrawnObject>();
 	private int homeNetChartIndex = 0;
 	private ArrayList<DrawnObject> awayNetChartItems = new ArrayList<DrawnObject>();
 	private int awayNetChartIndex = 0;
+
+	//possession chart variables
+	@FXML private Canvas PossessionDiagramCanvas;
+	@FXML private ColorPicker possCP;
+	private GraphicsContext possGC;
 
 	//Video tab scene variables
 	@FXML 
@@ -252,7 +255,7 @@ public class Controller {
 	 */
 	public void setPrimaryStage(Stage inStage) {
 		primaryStage = inStage;
-		
+
 		//Read the users keypath if it exists and populate the text field with the path
 		try {
 			Scanner f = new Scanner(new File("Key.txt"));
@@ -383,7 +386,7 @@ public class Controller {
 						awayGC1.clearRect(0, 0, RinkCanvas.getWidth(), RinkCanvas.getHeight());
 
 						ClipList.getItems().clear();
-						
+
 						//get all games selected by user, populate the associated charts
 						Object[] games = GameList.getSelectionModel().getSelectedItems().toArray();
 						for(int i = 0; i < games.length; i++) {
@@ -465,7 +468,7 @@ public class Controller {
 		} catch (Exception err) {
 			System.out.println(err);
 		}
-		
+
 		//Setting up the net/scoring chances charts
 		if(newScene.equals(ADMIN_NETCHART) || newScene.equals(ADMIN_SCORINGCHANCES)) {
 			try {
@@ -489,7 +492,7 @@ public class Controller {
 				} else if(newScene.equals(ADMIN_SCORINGCHANCES)) {
 					ovalWidth = 20;
 				}
-				
+
 				//add games to picker dropdown
 				GamePicker.getItems().addAll(m.getGameStats());
 
@@ -505,7 +508,7 @@ public class Controller {
 				rinkGC.setFill(RinkCP.getValue());
 				rinkGC.setLineWidth(RinkSlider.getValue());
 				rinkGC.setFont(new Font("Verdana", 24));
-				
+
 				//draws associated diagram and populates information for a selected timestamp
 				TimeStamps.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
 					@Override
@@ -550,9 +553,27 @@ public class Controller {
 				PlayerList.getItems().addAll(m.playerNames());
 			} catch(Exception e) {}
 		}
-		
+
+		/*
+		 * variables for this
+		 * Canvas PossessionDiagramCanvas
+		 * ColorPicker possCP
+		 * GraphicsContext possGC
+		 */
+
 		if(newScene.equals(ADMIN_POSSESSIONDIAGRAM)) {
-			
+			try {
+				
+				//set up graphics??
+				possCP.setValue(Color.BLACK);
+				possGC = PossessionDiagramCanvas.getGraphicsContext2D();
+				possGC.setLineWidth(7);
+				possGC.setStroke(possCP.getValue());
+				possGC.setFill(possCP.getValue());
+				possGC.setFont(new Font("Verdana", 24));
+				
+			} catch(Exception e) {}
+
 		}
 	}
 
@@ -644,7 +665,7 @@ public class Controller {
 	public void submitKey() {
 		primaryStage.getScene().setCursor(Cursor.WAIT);
 		String keyVal = databaseKey.getText();
-		
+
 		//Create a task to connect to database, async call
 		Task<Boolean> task = new Task<Boolean>() {
 			@Override
@@ -655,7 +676,7 @@ public class Controller {
 				return result ;
 			}
 		};
-		
+
 		//get the result of db connection
 		//if success -> go to login page
 		//if fail -> alert error to user
@@ -912,7 +933,7 @@ public class Controller {
 	public void drawCircle(MouseEvent e) {
 		//set a home circle
 		if(netChartCanvas == HomeNetChartCanvas) {
-			
+
 			//draw the circle
 			Point p1 = new Point(e.getX()-(ovalWidth/2), e.getY()-(ovalWidth/2), homeGC.getStroke());
 			homeGC.strokeOval(p1.getX(), p1.getY(), ovalWidth, ovalWidth);
@@ -925,9 +946,9 @@ public class Controller {
 			homeGC.fillText(""+ ++homeNetChartIndex, p2.getX(), p2.getY());
 			DrawnObject number = new DrawnObject(p2, p1.getColor(), 0, ""+homeNetChartIndex);
 			homeNetChartItems.add(number);
-		
+
 		} else if(netChartCanvas == AwayNetChartCanvas) { //away circle
-			
+
 			//draw circle
 			Point p1 = new Point(e.getX()-(ovalWidth/2), e.getY()-(ovalWidth/2), awayGC.getStroke());
 			awayGC.strokeOval(p1.getX(), p1.getY(), ovalWidth, ovalWidth);
@@ -1025,7 +1046,7 @@ public class Controller {
 				//start the line
 				gc.beginPath();
 				gc.setLineWidth(obj.getWidth());
-				
+
 				//draw all points on line
 				for(int xy = 0; xy < obj.size(); xy++) {
 					Point p = obj.getPoint(xy);
@@ -1236,7 +1257,7 @@ public class Controller {
 			playersAL.add(player);
 		}
 		clips.get(index).addPlayer(playersAL);
-		
+
 		diagramSuccess.setVisible(true);
 		PauseTransition visiblePause = new PauseTransition(Duration.seconds(2));
 		visiblePause.setOnFinished(event -> diagramSuccess.setVisible(false));
