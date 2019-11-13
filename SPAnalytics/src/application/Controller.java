@@ -193,6 +193,7 @@ public class Controller {
 	private final String	GOALIE_CARD_PERCENT		= "/View/SPAnalytics-goalieCardPercent.fxml";
 	private final String	ADMIN_SCORINGCHANCES	= "/View/Admin_ScoringChances.fxml";
 	private final String	ADMIN_RINKDIAGRAM		= "/View/Admin_RinkDiagram.fxml";
+	private final String	ADMIN_POSSESSIONDIAGRAM	= "/View/Admin_PossessionDiagram.fxml";
 	private final String	ADMIN_NETCHART			= "/View/Admin_NetChart.fxml";
 	private final String	ADMIN_HOME				= "/View/AdminHome.fxml";
 	private final String	ADMIN_ADD				= "/View/ADMIN_ADD.fxml";
@@ -549,6 +550,10 @@ public class Controller {
 				PlayerList.getItems().addAll(m.playerNames());
 			} catch(Exception e) {}
 		}
+		
+		if(newScene.equals(ADMIN_POSSESSIONDIAGRAM)) {
+			
+		}
 	}
 
 	/**
@@ -812,6 +817,13 @@ public class Controller {
 		loadScene(ADMIN_RINKDIAGRAM);
 	}
 
+	/**
+	 * This is the method that will go to the possession diagram scene.
+	 */
+	@FXML
+	public void PossessionDiagramClicked() {
+		loadScene(ADMIN_POSSESSIONDIAGRAM);
+	}
 
 	// player card button functionalities 
 	/**
