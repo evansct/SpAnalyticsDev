@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>SPAnalytics</name>
-	<comment></comment>
+	<comment>A Hockey Analytics software created as our senior design project.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
