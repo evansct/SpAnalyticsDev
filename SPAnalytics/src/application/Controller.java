@@ -31,6 +31,7 @@ import com.sun.javafx.css.Style;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -65,6 +66,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -93,9 +95,10 @@ public class Controller {
 	private ChoiceBox<String>		rosterList;
 	@FXML
 	private ComboBox<String>		users;
-
 	@FXML
 	private PasswordField			adminPass;
+//	@FXML
+//	public Button 					exitButton; // soon to be implemented exit button
 
 	//Player/Goalie card variables
 	@FXML ComboBox GamePicker;
@@ -136,15 +139,37 @@ public class Controller {
 	@FXML private Label homeNetChartSuccess;
 	@FXML private Label awayNetChartFail;
 	@FXML private Label awayNetChartSuccess;
-	private ArrayList<DrawnObject> homeNetChartItems = new ArrayList<DrawnObject>();
-	private int homeNetChartIndex = 0;
-	private ArrayList<DrawnObject> awayNetChartItems = new ArrayList<DrawnObject>();
-	private int awayNetChartIndex = 0;
-
+	
 	//possession chart variables
 	@FXML private Canvas PossessionDiagramCanvas;
 	@FXML private ColorPicker possCP;
 	private GraphicsContext possGC;
+	
+	//Shot Chart variables 
+	@FXML private ComboBox<String> teamForCombo;
+	@FXML private ComboBox<String> teamAgainstCombo;
+	@FXML private ComboBox<String> playerCombo;
+	@FXML private ComboBox<String> statusCombo;
+	@FXML private ComboBox<String> shotCombo;
+	@FXML private ComboBox<String> shotTypeCombo;
+	@FXML private ComboBox<String> rbCombo;
+	@FXML private ComboBox<String> goalieCombo;
+	@FXML private ComboBox<String> extraInfoCombo;
+	
+	@FXML private ComboBox<String> playTypeCombo;
+	@FXML private ComboBox<String> playerStatusCombo;
+	@FXML private ComboBox<String> releaseTypeCombo;
+	@FXML private ComboBox<String> pChanceCombo;
+	@FXML private ComboBox<String> sChanceCombo;
+	@FXML private ComboBox<String> createdByCombo;
+	@FXML private ComboBox<String> resultCombo;
+	@FXML private ComboBox<String> scoringChanceCombo;
+	@FXML private TextField urlTextField;
+
+	private ArrayList<DrawnObject> homeNetChartItems = new ArrayList<DrawnObject>();
+	private int homeNetChartIndex = 0;
+	private ArrayList<DrawnObject> awayNetChartItems = new ArrayList<DrawnObject>();
+	private int awayNetChartIndex = 0;
 
 	//Video tab scene variables
 	@FXML 
@@ -202,6 +227,7 @@ public class Controller {
 	private final String	ADMIN_ADD				= "/View/ADMIN_ADD.fxml";
 	private final String	KEY						= "/View/Admin_Key.fxml";
 	private final String	CSS						= "/View/application.css";
+	private final String    SHOT_CHART              = "/View/ShotChart.fxml";
 
 
 	//add player to database variables
@@ -243,9 +269,6 @@ public class Controller {
 	@FXML
 	private JFXButton			addGame;
 
-
-
-
 	//Database connection
 	Model m = new Model();
 
@@ -255,7 +278,7 @@ public class Controller {
 	 */
 	public void setPrimaryStage(Stage inStage) {
 		primaryStage = inStage;
-
+		
 		//Read the users keypath if it exists and populate the text field with the path
 		try {
 			Scanner f = new Scanner(new File("Key.txt"));
@@ -266,7 +289,14 @@ public class Controller {
 			System.out.println(e.getMessage());
 		}
 	}
-
+	/**
+	 * Method that will close the application when the Exit button is clicked 
+	 */
+//	@FXML
+//	public void handleCloseButtonAction(ActionEvent event) {
+//	    Stage stage = (Stage) exitButton .getScene().getWindow();
+//	    stage.close();
+//	}
 
 	/**
 	 * Helper method that will load scene
@@ -386,7 +416,7 @@ public class Controller {
 						awayGC1.clearRect(0, 0, RinkCanvas.getWidth(), RinkCanvas.getHeight());
 
 						ClipList.getItems().clear();
-
+						
 						//get all games selected by user, populate the associated charts
 						Object[] games = GameList.getSelectionModel().getSelectedItems().toArray();
 						for(int i = 0; i < games.length; i++) {
@@ -468,7 +498,7 @@ public class Controller {
 		} catch (Exception err) {
 			System.out.println(err);
 		}
-
+		
 		//Setting up the net/scoring chances charts
 		if(newScene.equals(ADMIN_NETCHART) || newScene.equals(ADMIN_SCORINGCHANCES)) {
 			try {
@@ -492,7 +522,7 @@ public class Controller {
 				} else if(newScene.equals(ADMIN_SCORINGCHANCES)) {
 					ovalWidth = 20;
 				}
-
+				
 				//add games to picker dropdown
 				GamePicker.getItems().addAll(m.getGameStats());
 
@@ -508,7 +538,7 @@ public class Controller {
 				rinkGC.setFill(RinkCP.getValue());
 				rinkGC.setLineWidth(RinkSlider.getValue());
 				rinkGC.setFont(new Font("Verdana", 24));
-
+				
 				//draws associated diagram and populates information for a selected timestamp
 				TimeStamps.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
 					@Override
@@ -553,14 +583,7 @@ public class Controller {
 				PlayerList.getItems().addAll(m.playerNames());
 			} catch(Exception e) {}
 		}
-
-		/*
-		 * variables for this
-		 * Canvas PossessionDiagramCanvas
-		 * ColorPicker possCP
-		 * GraphicsContext possGC
-		 */
-
+		
 		if(newScene.equals(ADMIN_POSSESSIONDIAGRAM)) {
 			try {
 				
@@ -575,8 +598,112 @@ public class Controller {
 			} catch(Exception e) {}
 
 		}
-	}
+		
+		if(newScene.equals(SHOT_CHART)) {
+			
+			//gets all the info for each combo box
+			netChartCanvas = HomeNetChartCanvas;
+			
+			homeGC = HomeNetChartCanvas.getGraphicsContext2D();
+			homeGC.setStroke(Color.color(.77, .13, .2));
+			homeGC.setLineWidth(7);
+			homeNetChartItems = new ArrayList<DrawnObject>();
+			homeNetChartIndex = 0;
 
+//			awayGC = AwayNetChartCanvas.getGraphicsContext2D();
+//			awayGC.setStroke(Color.color(.77, .13, .2));
+//			awayGC.setLineWidth(7);
+//			awayNetChartItems = new ArrayList<DrawnObject>();
+//			awayNetChartIndex = 0;
+			ovalWidth = 30;
+			initializeDropdowns();
+		}	
+	}// end of loadScene Method 
+
+	public void initializeDropdowns() {
+		//gets all the info for each combo box
+		GamePicker.getItems().addAll(m.getGameStats());
+	    playTypeCombo.getItems().addAll();   	//DEFINED IN DATABASE
+	    releaseTypeCombo.getItems().addAll(
+	    		"One-timer",
+	    		"Catch-Shoot");
+		pChanceCombo.getItems().addAll(
+				"3","4","6","7","9","10","11","13","18","19","20","22",
+				"28","31","33","36","37","39","55","67","71","81","85");
+		sChanceCombo.getItems().addAll(
+				"3","4","6","7","9","10","11","13","18","19","20","22",
+				"28","31","33","36","37","39","55","67","71","81","85");
+		createdByCombo.getItems().addAll(
+				"3","4","6","7","9","10","11","13","18","19","20","22",
+				"28","31","33","36","37","39","55","67","71","81","85");
+		resultCombo.getItems().addAll(
+				"First Goal",
+				"Down >2",
+				"Down 2",
+				"Down 1",
+				"Tied",
+				"Up 1",
+				"Up 2",
+				"Up >2",
+				"Empty Net"
+				);
+		teamForCombo.getItems().addAll(
+				"CC",
+				"Denver",
+				"Miami",
+				"UMD",
+				"UND",
+				"UNO",
+				"SCSU",
+				"WMU",
+				"Other");
+		teamAgainstCombo.getItems().addAll(
+				"CC",
+				"Denver",
+				"Miami",
+				"UMD",
+				"UND",
+				"UNO",
+				"SCSU",
+				"WMU",
+				"Other");
+		playerCombo.getItems().addAll(
+				"3","4","6","7","9","10","11","13","18","19","20","22",
+				"28","31","33","36","37","39","55","67","71","81","85");
+		playerStatusCombo.getItems().addAll(
+				"Stationary",
+				"Moving Forward",
+				"Moving Across");
+		shotCombo.getItems().addAll(
+				"1","2","3","4","5","6","7","8","9","10",
+				"11","12","13","14","15","16","17","18","19","20",
+				"21","22","23","24","25","26","27","28","29","30",
+				"31","32","33","34","35","36","37","38","39","40","41","42","43","44",
+				"45","46","47","48","49","50","51","52","53","54","55","56",
+				"57","58","59","60","61","62","63","64","65","66","67","68","69","70",
+				"71","72","73","74","75","76","77","78","79","80","81","82","83","84","85",
+				"86","87","88","89","90","91","92","93","94","95","96","97","98","99","100");
+		shotTypeCombo.getItems().addAll(
+				"Wrist shot" 
+				,"Slapshot"
+				,"Backhand");
+		rbCombo.getItems().addAll(
+				"Yes",
+				"No");
+		goalieCombo.getItems().addAll(
+				"Moving",
+				"Stationary");
+		extraInfoCombo.getItems().addAll(
+				"5v5", "4v4","3v3",	"5v4","4v5",
+				"5v3","3v5","4v3","3v4","6v5","5v6","6v4","4v6","6v3","3v6");
+		statusCombo.getItems().addAll(
+				"Goal",
+				"No Goal");
+		scoringChanceCombo.getItems().addAll(
+				"Yes",
+				"No");
+	}//end of initializeDropdowns()
+		
 	/**
 	 * Helper method to copy rink diagram from Clip object to the drawList
 	 */
@@ -665,7 +792,7 @@ public class Controller {
 	public void submitKey() {
 		primaryStage.getScene().setCursor(Cursor.WAIT);
 		String keyVal = databaseKey.getText();
-
+		
 		//Create a task to connect to database, async call
 		Task<Boolean> task = new Task<Boolean>() {
 			@Override
@@ -676,7 +803,7 @@ public class Controller {
 				return result ;
 			}
 		};
-
+		
 		//get the result of db connection
 		//if success -> go to login page
 		//if fail -> alert error to user
@@ -745,8 +872,7 @@ public class Controller {
 	public void databaseClicked() {
 		loadScene(ADMIN_ADD);
 	}
-
-
+	
 	/**
 	 * This is the method that will add a player to the database.
 	 */
@@ -829,7 +955,14 @@ public class Controller {
 		loadScene(ADMIN_SCORINGCHANCES);
 	}
 
-
+	/**
+	 * This is the method that will go to the possession diagram scene.
+	 */
+	@FXML
+	public void PossessionDiagramClicked() {
+		loadScene(ADMIN_POSSESSIONDIAGRAM);
+	}
+	
 	/**
 	 * This is the method that will go to the rink diagram scene.
 	 */
@@ -838,13 +971,6 @@ public class Controller {
 		loadScene(ADMIN_RINKDIAGRAM);
 	}
 
-	/**
-	 * This is the method that will go to the possession diagram scene.
-	 */
-	@FXML
-	public void PossessionDiagramClicked() {
-		loadScene(ADMIN_POSSESSIONDIAGRAM);
-	}
 
 	// player card button functionalities 
 	/**
@@ -907,6 +1033,13 @@ public class Controller {
 	public void GoalieLogoutButtonClicked() {
 		loadScene(LOGIN_SCENE);
 	}
+	/**
+	 * This method loads the Shot Chart page 
+	 */
+	@FXML
+	public void shotChartClicked() {
+		loadScene(SHOT_CHART);
+	}
 
 	/**
 	 * This is the method that will change the color of the circle to red
@@ -933,7 +1066,11 @@ public class Controller {
 	public void drawCircle(MouseEvent e) {
 		//set a home circle
 		if(netChartCanvas == HomeNetChartCanvas) {
-
+			
+			System.out.println(e.getY());
+			//System.out.println("HOME GC WHATEVER: " + homeGC.toString());// This gives me the error
+			System.out.println("OVAL WIDTH" +  ovalWidth); //ovalWidth is 0 
+			
 			//draw the circle
 			Point p1 = new Point(e.getX()-(ovalWidth/2), e.getY()-(ovalWidth/2), homeGC.getStroke());
 			homeGC.strokeOval(p1.getX(), p1.getY(), ovalWidth, ovalWidth);
@@ -946,9 +1083,9 @@ public class Controller {
 			homeGC.fillText(""+ ++homeNetChartIndex, p2.getX(), p2.getY());
 			DrawnObject number = new DrawnObject(p2, p1.getColor(), 0, ""+homeNetChartIndex);
 			homeNetChartItems.add(number);
-
+		
 		} else if(netChartCanvas == AwayNetChartCanvas) { //away circle
-
+			
 			//draw circle
 			Point p1 = new Point(e.getX()-(ovalWidth/2), e.getY()-(ovalWidth/2), awayGC.getStroke());
 			awayGC.strokeOval(p1.getX(), p1.getY(), ovalWidth, ovalWidth);
@@ -1046,7 +1183,7 @@ public class Controller {
 				//start the line
 				gc.beginPath();
 				gc.setLineWidth(obj.getWidth());
-
+				
 				//draw all points on line
 				for(int xy = 0; xy < obj.size(); xy++) {
 					Point p = obj.getPoint(xy);
@@ -1257,7 +1394,7 @@ public class Controller {
 			playersAL.add(player);
 		}
 		clips.get(index).addPlayer(playersAL);
-
+		
 		diagramSuccess.setVisible(true);
 		PauseTransition visiblePause = new PauseTransition(Duration.seconds(2));
 		visiblePause.setOnFinished(event -> diagramSuccess.setVisible(false));
