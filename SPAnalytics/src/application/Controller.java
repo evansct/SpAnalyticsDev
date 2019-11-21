@@ -595,6 +595,8 @@ public class Controller {
 				possGC.setFill(possCP.getValue());
 				possGC.setFont(new Font("Verdana", 24));
 				
+				// This is where the functionality for the code will go for priority 2
+				
 			} catch(Exception e) {}
 
 		}
