@@ -14,7 +14,7 @@
    <center>
       <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fitHeight="300.0" fitWidth="300.0" layoutX="325.0" layoutY="187.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="243.0" fitWidth="206.0" layoutX="416.0" layoutY="221.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../Images/SPLogo.jpg" />
                </image>
